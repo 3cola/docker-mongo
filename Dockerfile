@@ -13,7 +13,8 @@ RUN apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv EA312927 &&\
     echo "deb http://repo.mongodb.org/apt/ubuntu "$(lsb_release -sc)"/mongodb-org/3.2 multiverse" | tee /etc/apt/sources.list.d/mongodb-org-3.2.list &&\
     apt-get update &&\
     apt-get install -y mongodb-org supervisor &&\
-    apt-get clean all && apt-get autoremove -y
+    apt-get clean all && apt-get autoremove -y &&\
+    rm -rf /var/lib/apt/lists/*
 
 RUN mkdir -p /data/db &&\
     chgrp -R mongodb /data/db && chown -R mongodb /data/db
@@ -21,6 +22,8 @@ RUN mkdir -p /data/db &&\
 COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 COPY mongod.conf /etc/mongod.conf
 
-EXPOSE 27017 
+EXPOSE 27017
+
+VOLUME /var/log /data
 
 CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
